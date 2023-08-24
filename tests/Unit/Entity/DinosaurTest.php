@@ -2,21 +2,21 @@
 
 namespace App\Tests\Unit\Entity;
 
+use App\Entity\Dinosaur;
 use PHPUnit\Framework\TestCase;
 
 class DinosaurTest extends TestCase
 {
 
-    public function testItWorks(): void
+    public function testCanGetAndSetData(): void
     {
 
-        self::assertEquals(expected:42, actual:'42');
-    }
+        $dino = new Dinosaur('Big Eaty','Tyrannosaurus',15,'Paddock A');
 
+        self::assertSame('Big Eaty', $dino->getName());
+        self::assertSame('Tyrannosaurus', $dino->getGenus());
+        self::assertSame(15, $dino->getLength());
+        self::assertSame('Paddock A', $dino->getEnclosure());        
 
-    public function testItWorksTheSame(): void
-    {
-        self::assertSame(expected:42, actual:'42');
-        //self::assertCount(expectedCount: 3, haystack:[1,2,3], message:'Yes!');
     }
 }
