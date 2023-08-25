@@ -18,7 +18,10 @@ class GithubService
 
         $response = $this->httpClient->request(
             method: 'GET',
-            url: 'https://api.github.com/repos/SymfonyCasts/dino-park/issues'
+            url: 'https://api.github.com/repos/SymfonyCasts/dino-park/issues',
+            options: [
+                'verify_peer' => false,
+            ]
         );
 
         $this->logger->info('Request Dino Issues', [
@@ -38,7 +41,7 @@ class GithubService
     private function getDinoStatusFromLabels(array $labels): HealthStatus
     {
         $status = null;
-
+        
         foreach ($labels as $label) {
             $label = $label['name'];
 
