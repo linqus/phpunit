@@ -7,6 +7,7 @@ use App\Service\GithubService;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -53,5 +54,37 @@ class GithubServiceTest extends TestCase
     {
         yield 'Sick Dino' => [HealthStatus::SICK, 'Daisy'];
         yield 'Healthy Dino' => [HealthStatus::HEALTHY, 'Maverick'];
+    }
+
+    public function testExceptionThrownWithUnknownLabel(): void
+    {
+
+        $mockLogger = $this->createMock(LoggerInterface::class);
+        $mockHttpClient = $this->createMock(HttpClientInterface::class);
+        $mockResponse = $this->createMock(ResponseInterface::class);
+
+        $mockResponse
+            ->method('toArray')
+            ->willReturn([
+                [
+                    'title' => 'Daisy',
+                    'labels' => [['name'=> 'Status: Angry']]
+                ],
+            ])
+        ;
+
+        $mockHttpClient
+            ->expects(self::once())
+            ->method('request')
+            ->with('GET', 'https://api.github.com/repos/SymfonyCasts/dino-park/issues')
+            ->willReturn($mockResponse)
+        ;
+
+        $service = new GithubService($mockHttpClient, $mockLogger);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Angry is an unknown status label!');
+
+        $service->getHealthReport('Daisy');
     }
 }
